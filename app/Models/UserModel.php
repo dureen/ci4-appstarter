@@ -6,35 +6,38 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $DBGroup          = 'default';
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
+
+    protected $allowedFields = [
         'name',
         'email',
         'password',
         'email_verified_at',
         'token',
         'level',
-        'updated_at'
     ];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $validationRules = [
+        'name'     => 'required|min_length[2]|max_length[50]',
+        'email'    => 'required|valid_email|is_unique[users.email,id,{id}]',
+        'password' => 'required|min_length[8]',
+        'level'    => 'permit_empty|in_list[1,2]',
+    ];
+
+    protected $validationMessages = [];
+    protected $skipValidation     = false;
     protected $cleanValidationRules = true;
 
     // Callbacks
@@ -47,12 +50,4 @@ class UserModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function getUser($id = null)
-    {
-        if (! $id) {
-            return $this->findAll();
-        }
-        return $this->find($id);
-    }
 }
